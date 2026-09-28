@@ -1,0 +1,11 @@
+from pathlib import Path
+p=Path('src/App.vue'); s=p.read_text(encoding='utf-8')
+s=s.replace("const introVisible = ref(true)\n",'')
+s=s.replace("<div :class=\"['intro-glass', { 'intro-collapsed': !introVisible }]\"><p v-if=\"introVisible\">",'<div class="intro-glass"><p>')
+s=s.replace('<button aria-label="Close introduction" @click="introVisible = false"><X :size="21"/></button>','')
+s=s.replace('<button class="section-next" @click="go(\'collection\')">EXPLORE COLLECTION <ArrowRight :size="15"/></button>','')
+s=s.replace('<img :src="p.image" :alt="p.name"/><span>{{ p.name }} <ArrowRight :size="16"/></span></button></div></section>','<img :src="p.id === 5 ? \'/images/best-sleeve.jpg\' : p.id === 3 ? \'/images/best-chocolate.jpg\' : p.image" :alt="p.name"/><span>{{ p.name }} <ArrowRight :size="16"/></span></button></div></section>')
+s=s.replace('@click="searchOpen = !searchOpen"><span>Search</span>', '@click="document.getElementById(\'new-collection\')?.scrollIntoView({behavior:\'smooth\'})"><span>Search</span>')
+s=s.replace('@keyup.enter="go(\'home\')"', '@keyup.enter="document.getElementById(\'new-collection\')?.scrollIntoView({behavior:\'smooth\'})"')
+p.write_text(s,encoding='utf-8')
+print('intro x',s.count('Close introduction'),'section CTA',s.count('EXPLORE COLLECTION'),'best crops',s.count('best-sleeve.jpg'))

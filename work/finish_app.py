@@ -1,0 +1,16 @@
+from pathlib import Path
+p = Path('src/App.vue')
+s = p.read_text(encoding='utf-8')
+lines = s.splitlines()
+for i, line in enumerate(lines):
+    if '<main v-else-if="screen === \'cart\'"' in line:
+        lines[i] = """    <main v-else-if=\"screen === 'cart'\" class=\"cart-page\"><button class=\"back-pill\" @click=\"go('home')\"><ArrowLeft :size=\"22\"/> BACK</button><div class=\"cart-panel\"><div class=\"cart-alert\"><span class=\"alert-icon\">!</span><h1>ATTENTION!<br/><em>Confirm your<br/>orders and<br/>pay it!</em></h1></div><div v-if=\"cart.length\" class=\"cart-list\"><article v-for=\"(p,i) in checkoutItems\" :key=\"i + '-' + p.id\"><img :src=\"p.image\" :alt=\"p.name\"/><div><strong>{{ p.id === 2 ? 'Basket Socks' : p.id === 5 ? 'Sleeve' : p.id === 4 ? 'Wave Basketball' : p.name }}</strong><b>{{ fmt(p.price) }}</b></div><button aria-label=\"Remove\" @click=\"cart.splice(cart.indexOf(p),1)\"><X :size=\"17\"/></button></article><div class=\"cart-total\"><span>TOTAL</span><strong>{{ fmt(total) }} ₸</strong></div><button class=\"pay-button\" @click=\"cart = []; go('home')\">Pay</button></div><div v-else class=\"empty-cart\"><ShoppingCart :size=\"42\"/><h2>Your cart is empty</h2><p>Find your next game-day essential.</p><button class=\"pay-button\" @click=\"go('home')\">Go shopping</button></div></div></main>"""
+    if '<main v-else-if="screen === \'login\' || screen === \'register\'"' in line:
+        lines[i] = """    <main v-else-if=\"screen === 'login' || screen === 'register'\" class=\"auth-page\"><div class=\"auth-bg\"></div><form class=\"auth-glass\" @submit.prevent=\"go('home')\"><input type=\"email\" placeholder=\"Email\" required/><input type=\"password\" placeholder=\"Password\" required/><input v-if=\"screen === 'register'\" type=\"password\" placeholder=\"Confirm password\" required/><button class=\"auth-submit\">{{ screen === 'login' ? 'Login' : 'Register' }}</button><button v-if=\"screen === 'login'\" class=\"auth-switch\" type=\"button\" @click=\"go('register')\">Create account</button><button v-else class=\"auth-switch\" type=\"button\" @click=\"go('login')\">Login</button></form></main>"""
+s = '\n'.join(lines) + '\n'
+needle = '  </div>\n</template>'
+overlay = """    <aside v-if=\"cartOpen\" class=\"mini-cart-overlay\" @click.self=\"cartOpen = false\"><section class=\"mini-cart\"><button class=\"mini-cart-close\" aria-label=\"Close cart\" @click=\"cartOpen = false\"><X :size=\"22\"/></button><article v-for=\"(p,i) in cart\" :key=\"i + '-' + p.id\" class=\"mini-cart-item\"><img :src=\"p.image\" :alt=\"p.name\"/><div class=\"mini-cart-product\"><strong>{{ p.id === 4 ? 'Wave Basketball' : p.id === 2 ? 'Basket Socks' : p.id === 5 ? 'Sleeve' : p.name }}</strong><div><b>{{ fmt(p.price) }}</b><span>₸</span></div></div><button aria-label=\"Edit item\"><Pencil :size=\"16\"/></button><button aria-label=\"Remove item\" @click=\"cart.splice(i,1)\"><Trash2 :size=\"16\"/></button><button aria-label=\"Select item\"><CircleCheck :size=\"17\"/></button></article><button class=\"mini-cart-buy\" :disabled=\"!cart.length\" @click=\"cartOpen = false; go('cart')\">Buy</button></section></aside>\n"""
+if needle in s and 'mini-cart-overlay' not in s:
+    s = s.replace(needle, overlay + needle, 1)
+p.write_text(s, encoding='utf-8')
+print('updated cart and auth screens')
